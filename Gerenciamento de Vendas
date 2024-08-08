@@ -1,0 +1,38 @@
+CREATE TABLE Clientes (
+    ClienteID INT PRIMARY KEY,
+    Nome VARCHAR(100),
+    Email VARCHAR(100),
+    DataCadastro DATE
+);
+
+CREATE TABLE Produtos (
+    ProdutoID INT PRIMARY KEY,
+    Nome VARCHAR(100),
+    Preco DECIMAL(10, 2),
+    Estoque INT
+);
+
+CREATE TABLE Vendas (
+    VendaID INT PRIMARY KEY,
+    ClienteID INT,
+    ProdutoID INT,
+    Quantidade INT,
+    DataVenda DATE,
+    FOREIGN KEY (ClienteID) REFERENCES Clientes(ClienteID),
+    FOREIGN KEY (ProdutoID) REFERENCES Produtos(ProdutoID)
+);
+
+CREATE OR REPLACE PROCEDURE RegistrarVenda(
+    p_ClienteID INT,
+    p_ProdutoID INT,
+    p_Quantidade INT
+) IS
+BEGIN
+    INSERT INTO Vendas (VendaID, ClienteID, ProdutoID, Quantidade, DataVenda)
+    VALUES (seq_vendas.NEXTVAL, p_ClienteID, p_ProdutoID, p_Quantidade, SYSDATE);
+    
+    UPDATE Produtos
+    SET Estoque = Estoque - p_Quantidade
+    WHERE ProdutoID = p_ProdutoID;
+END;
+/
